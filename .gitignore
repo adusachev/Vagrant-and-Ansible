@@ -1,0 +1,4 @@
+*.vagrant
+test*
+*shared
+tmp_*
