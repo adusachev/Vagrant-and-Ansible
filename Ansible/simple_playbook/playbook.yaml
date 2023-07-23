@@ -1,0 +1,11 @@
+---
+- hosts: ubuntu
+  vars:
+    pkg_name: mc
+  tasks:
+    - name: "Install {{pkg_name}} for ubuntu"
+      become: yes
+      apt:
+        name: "{{pkg_name}}"
+        state: latest
+        update_cache: yes

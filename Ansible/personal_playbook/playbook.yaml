@@ -1,0 +1,101 @@
+---
+- hosts: ubuntu
+  vars:
+      username: vagrant
+
+  tasks:  
+    - name: "Add Docker's official GPG key"
+      become: yes
+      apt_key:
+        url: "https://download.docker.com/linux/ubuntu/gpg"
+        state: present
+
+    - name: "Add Docker's repo"
+      become: yes
+      apt_repository:
+        repo: "deb [arch=amd64] https://download.docker.com/linux/{{ ansible_facts['distribution'] | lower }} {{ ansible_facts['distribution_release'] }} stable"
+        state: present
+
+    - name: "Create Docker group"
+      become: yes
+      group:
+        name: docker
+        state: present
+
+    - name: "Add user to Docker group"
+      become: yes
+      user:
+        name: "{{ username }}"
+        groups: docker
+        append: yes
+
+    - name: "Install packages"
+      become: yes
+      apt:
+        pkg:
+          - vim
+          - tmux
+          - git
+          - curl
+          - wget
+          - htop
+          - build-essential
+          - python3-pip
+          - python3-venv
+          - bat
+          - docker-ce
+          - docker-ce-cli
+          - docker-compose
+          - containerd.io
+          - gnupg-agent
+          - openssh-server
+        update_cache: yes
+
+    - name: "Install pip dependencies"
+      pip:
+        name:
+          - numpy
+          - docker
+
+    - name: Add aliases
+      become: yes
+      lineinfile:
+        path="/home/{{ username }}/.bashrc"
+        line="{{ item }}"
+        owner="{{ username }}"
+        state=present
+        insertafter=EOF
+        create=True
+      with_items:
+        - alias ctop="docker run --rm -ti --name=ctop --volume /var/run/docker.sock:/var/run/docker.sock:ro quay.io/vektorlab/ctop:latest"
+        - alias bat="batcat"
+
+    # - name: "Generate an OpenSSH keypair"
+    #   openssh_keypair:
+    #     path: "{{ playbook_dir }}/ssh_key/id_ssh_rsa"
+
+    # - name: "Change keypair owner"
+    #   file:
+    #     path: "{{ playbook_dir }}/ssh_key/{{ item }}"
+    #     owner: "{{ username }}"
+    #   with_items:
+    #     - id_ssh_rsa
+    #     - id_ssh_rsa.pub
+
+    # - name: "Add SSH authorized key"
+    #   authorized_key:
+    #     user: "{{ username }}"
+    #     state: present
+    #     key: "{{ lookup('file', playbook_dir+'/ssh_key/id_ssh_rsa.pub') }}"
+    #     exclusive: yes
+
+    # - name: "Disable login by password"
+    #   replace:
+    #     path: /etc/ssh/sshd_config
+    #     regexp: ".*PasswordAuthentication.*"
+    #     replace: "PasswordAuthentication no"
+
+    # - name: "Restart sshd"
+    #   service:
+    #     name: sshd
+    #     state: restarted

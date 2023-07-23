@@ -1,0 +1,30 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+
+$update_script=<<SCRIPT
+apt-get update
+apt-get upgrade
+apt-get install python3 -y
+SCRIPT
+
+Vagrant.configure("2") do |config|
+
+  config.vm.box = "bento/ubuntu2004"
+
+  config.vm.define :node1 do |node1|
+    config.vm.provider "vmware_desktop" do |vb|
+      vb.cpus = '1'
+      vb.memory = "1024"
+    end
+    master.vm.network :private_network, ip: "192.168.56.13"
+    master.vm.hostname = "node1"
+  
+    master.vm.provision "shell", :inline => $update_script
+  end
+
+  config.vm.synced_folder "./shared", "/home/vagrant/shared",
+    owner: "www-data", group: "www-data"
+  config.vm.network "forwarded_port", guest: 80, host: 8000
+
+end
