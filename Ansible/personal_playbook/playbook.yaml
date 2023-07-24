@@ -57,7 +57,7 @@
           - numpy
           - docker
 
-    - name: Add aliases
+    - name: "Add aliases"
       become: yes
       lineinfile:
         path="/home/{{ username }}/.bashrc"
@@ -68,7 +68,14 @@
         create=True
       with_items:
         - alias ctop="docker run --rm -ti --name=ctop --volume /var/run/docker.sock:/var/run/docker.sock:ro quay.io/vektorlab/ctop:latest"
-        - alias bat="batcat"
+        # - alias bat="batcat"
+
+    - name: "Create link bat to batcat"
+      become: yes
+      file:
+        src: '/usr/bin/batcat'
+        dest: '/usr/bin/bat'
+        state: link
 
     # - name: "Generate an OpenSSH keypair"
     #   openssh_keypair:
