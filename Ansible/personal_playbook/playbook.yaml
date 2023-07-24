@@ -77,32 +77,3 @@
         dest: '/usr/bin/bat'
         state: link
 
-    # - name: "Generate an OpenSSH keypair"
-    #   openssh_keypair:
-    #     path: "{{ playbook_dir }}/ssh_key/id_ssh_rsa"
-
-    # - name: "Change keypair owner"
-    #   file:
-    #     path: "{{ playbook_dir }}/ssh_key/{{ item }}"
-    #     owner: "{{ username }}"
-    #   with_items:
-    #     - id_ssh_rsa
-    #     - id_ssh_rsa.pub
-
-    # - name: "Add SSH authorized key"
-    #   authorized_key:
-    #     user: "{{ username }}"
-    #     state: present
-    #     key: "{{ lookup('file', playbook_dir+'/ssh_key/id_ssh_rsa.pub') }}"
-    #     exclusive: yes
-
-    # - name: "Disable login by password"
-    #   replace:
-    #     path: /etc/ssh/sshd_config
-    #     regexp: ".*PasswordAuthentication.*"
-    #     replace: "PasswordAuthentication no"
-
-    # - name: "Restart sshd"
-    #   service:
-    #     name: sshd
-    #     state: restarted
