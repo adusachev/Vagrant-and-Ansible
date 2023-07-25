@@ -1,0 +1,50 @@
+---
+- hosts: ubuntu
+  vars:
+      username: vagrant
+
+  tasks:
+    - name: "Install Nginx"
+      become: yes
+      apt:
+        pkg:
+          - nginx
+        update_cache: yes
+
+    - name: "Copy nginx configuration"
+      become: yes
+      copy:
+        src: ./static.conf
+        dest: /etc/nginx/conf.d/static.conf
+        mode: u=rw,g=r,o=r
+    
+    - name: "Copy state file"
+      copy:
+        src: ./service_state
+        dest: "/home/{{ username }}/service_state"
+        mode: u=rw,g=r,o=r
+      register: state_file_template
+
+    - name: "Create remote copy of state file"
+      become: yes
+      copy:
+        src: "/home/{{ username }}/service_state"
+        dest: /opt/service_state
+        mode: u=rw,g=r,o=r
+        remote_src: yes
+      when: state_file_template.changed
+      notify: Restart Nginx
+  
+    - name: "Setup cron job"
+      become: yes
+      cron:
+        name: "get nginx status"
+        minute: "*/1"
+        job: sed -i "s/is .*$/is $(($(ps -o etimes= -p $(cat /var/run/nginx.pid)) / 60)) minutes/" /opt/service_state
+
+  handlers:
+    - name: Restart Nginx
+      become: yes
+      service:
+        name: nginx
+        state: restarted
