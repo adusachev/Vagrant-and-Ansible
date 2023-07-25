@@ -1,11 +1,11 @@
 ---
 - hosts: ubuntu
   vars:
-      username: vagrant
+      username: www
 
   tasks:
     - name: Install ZSH
-      become: true
+      become: yes
       ansible.builtin.package:
         name: zsh
         state: present
