@@ -68,7 +68,8 @@
         create=True
       with_items:
         - alias ctop="docker run --rm -ti --name=ctop --volume /var/run/docker.sock:/var/run/docker.sock:ro quay.io/vektorlab/ctop:latest"
-        # - alias bat="batcat"
+        - alias lzd='docker run --rm -it -v /var/run/docker.sock:/var/run/docker.sock -v /yourpath/config:/.config/jesseduffield/lazydocker lazyteam/lazydocker'
+        - alias bat="bat -p"
 
     - name: "Create link bat to batcat"
       become: yes
